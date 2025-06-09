@@ -1,0 +1,1 @@
+SQL scripts for creating the database in XAMPP/MySQL Workbench.
