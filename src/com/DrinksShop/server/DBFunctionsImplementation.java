@@ -276,14 +276,19 @@ public class DBFunctionsImplementation extends UnicastRemoteObject implements DB
     }
 
     @Override
-    public ArrayList<Object> retrieveColumn (String field_name, String table_name, String conditions)  throws SQLException, RemoteException {
-        ArrayList<Object> arrayList = new ArrayList<>();
+    public ArrayList<Integer> getIntegerColumn(String field_name, String table_name, String conditions) throws SQLException, RemoteException{
+        ArrayList<Integer> arrayList = new ArrayList<>();
+        String query;
         connection = DatabaseConnection.getConnection();
         Statement statement = connection.createStatement();
-        String query = "SELECT " + field_name + " FROM " + table_name + " WHERE " + conditions;
+        if (conditions == null){
+            query = "SELECT " + field_name + " FROM " + table_name;
+        } else {
+            query = "SELECT " + field_name + " FROM " + table_name + " WHERE " + conditions;
+        }
         ResultSet resultSet = statement.executeQuery(query);
         while (resultSet.next()){
-            arrayList.add(resultSet.getObject(field_name));
+            arrayList.add(resultSet.getInt(field_name));
         }
         resultSet.close();
         statement.close();
@@ -292,14 +297,19 @@ public class DBFunctionsImplementation extends UnicastRemoteObject implements DB
     }
 
     @Override
-    public ArrayList<Object> retrieveColumn (String field_name, String table_name)  throws SQLException, RemoteException {
-        ArrayList<Object> arrayList = new ArrayList<>();
+    public ArrayList<String> getStringColumn(String field_name, String table_name, String conditions) throws SQLException, RemoteException{
+        ArrayList<String> arrayList = new ArrayList<>();
+        String query;
         connection = DatabaseConnection.getConnection();
         Statement statement = connection.createStatement();
-        String query = "SELECT " + field_name + " FROM " + table_name;
+        if (conditions == null){
+            query = "SELECT " + field_name + " FROM " + table_name;
+        } else {
+            query = "SELECT " + field_name + " FROM " + table_name + " WHERE " + conditions;
+        }
         ResultSet resultSet = statement.executeQuery(query);
         while (resultSet.next()){
-            arrayList.add(resultSet.getObject(field_name));
+            arrayList.add(resultSet.getString(field_name));
         }
         resultSet.close();
         statement.close();
