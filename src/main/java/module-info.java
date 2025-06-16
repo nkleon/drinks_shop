@@ -6,6 +6,7 @@ module com.drinksshop.client {
 
     requires org.controlsfx.controls;
     requires com.dlsc.formsfx;
+    requires java.desktop;
 
     exports com.drinksshop.client;
     exports com.drinksshop.shared;
