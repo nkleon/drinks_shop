@@ -1,6 +1,6 @@
-package com.DrinksShop.server;
+package com.drinksshop.server;
 
-import com.DrinksShop.shared.*;
+import com.drinksshop.shared.*;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;

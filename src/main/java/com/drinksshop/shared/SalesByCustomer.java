@@ -1,4 +1,4 @@
-package com.DrinksShop.shared;
+package com.drinksshop.shared;
 
 public class SalesByCustomer {
     private int customerID;

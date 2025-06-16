@@ -1,6 +1,6 @@
-package com.DrinksShop.client;
+package com.drinksshop.client;
 
-import com.DrinksShop.shared.DBFunctions;
+import com.drinksshop.shared.DBFunctions;
 
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
@@ -10,6 +10,6 @@ public class ServerConnection {
     private static String ipAddress = "localhost";
     private static int portNumber = 10800;
     public static DBFunctions dbFunctions() throws RemoteException, NotBoundException {
-        return  (DBFunctions) LocateRegistry.getRegistry(ipAddress, portNumber).lookup("DBFunctions");
+        return (DBFunctions) LocateRegistry.getRegistry(ipAddress, portNumber).lookup("DBFunctions");
     }
 }

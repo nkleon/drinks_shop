@@ -1,4 +1,4 @@
-package com.DrinksShop.server;
+package com.drinksshop.server;
 
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;

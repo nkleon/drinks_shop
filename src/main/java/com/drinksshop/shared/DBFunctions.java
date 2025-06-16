@@ -1,4 +1,4 @@
-package com.DrinksShop.shared;
+package com.drinksshop.shared;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
