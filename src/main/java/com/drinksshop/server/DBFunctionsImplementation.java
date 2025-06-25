@@ -152,6 +152,30 @@ public class DBFunctionsImplementation extends UnicastRemoteObject implements DB
     }
 
     @Override
+    public List<ClientOrderHistory> clientGetOrderHistory(int customer_id) throws SQLException, RemoteException{
+        List<ClientOrderHistory> selections = new ArrayList<>();
+        connection = DatabaseConnection.getConnection();
+        String query = "SELECT o.order_id, o.order_date, b.branch_name, d.drink_name, o.order_quantity, d.drink_price, (o.order_quantity * d.drink_price) AS total_price FROM orders o, drinks d, branches b WHERE o.drink_id = d.drink_id AND o.branch_id = b.branch_id AND o.customer_id = "+customer_id+" ORDER BY order_date DESC;";
+        Statement statement = connection.createStatement();
+        ResultSet resultSet = statement.executeQuery(query);
+        while (resultSet.next()) {
+            selections.add(new ClientOrderHistory(
+                    resultSet.getInt("order_id"),
+                    resultSet.getDate("order_date").toLocalDate(),
+                    resultSet.getString("branch_name"),
+                    resultSet.getString("drink_name"),
+                    resultSet.getInt("order_quantity"),
+                    resultSet.getInt("drink_price"),
+                    resultSet.getInt("total_price")
+            ));
+        }
+        resultSet.close();
+        statement.close();
+        connection.close();
+        return selections;
+    }
+
+    @Override
     public boolean addNewCustomer (String customer_email, String customer_name, String customer_phone, String customer_password)  throws SQLException, RemoteException {
         boolean executedSuccessfully;
         connection = DatabaseConnection.getConnection();
@@ -215,9 +239,10 @@ public class DBFunctionsImplementation extends UnicastRemoteObject implements DB
         preparedStatementOne.setInt(3, customer_id);
         preparedStatementOne.setInt(4, drink_id);
         preparedStatementOne.setInt(5, order_quantity);
-        PreparedStatement preparedStatementTwo = connection.prepareStatement("UPDATE stock SET drink_stock = (drink_stock - 1) WHERE drink_id = ? AND branch_id = ?");
-        preparedStatementTwo.setInt(1, drink_id);
-        preparedStatementTwo.setInt(2, branch_id);
+        PreparedStatement preparedStatementTwo = connection.prepareStatement("UPDATE stock SET drink_stock = (drink_stock - ?) WHERE drink_id = ? AND branch_id = ?");
+        preparedStatementTwo.setInt(1, order_quantity);
+        preparedStatementTwo.setInt(2, drink_id);
+        preparedStatementTwo.setInt(3, branch_id);
         if ((preparedStatementOne.executeUpdate() > 0) && (preparedStatementTwo.executeUpdate() > 0)){
             executedSuccessfully = true;
         } else {
@@ -286,6 +311,7 @@ public class DBFunctionsImplementation extends UnicastRemoteObject implements DB
         } else {
             query = "SELECT " + field_name + " FROM " + table_name + " WHERE " + conditions;
         }
+        //System.out.println(query);
         ResultSet resultSet = statement.executeQuery(query);
         while (resultSet.next()){
             arrayList.add(resultSet.getInt(field_name));

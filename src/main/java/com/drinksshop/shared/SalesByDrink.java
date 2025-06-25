@@ -1,6 +1,8 @@
 package com.drinksshop.shared;
 
-public class SalesByDrink {
+import java.io.Serializable;
+
+public class SalesByDrink implements Serializable {
     private int drinkID;
     private String drinkName;
     private int drinkOrderQuantity;

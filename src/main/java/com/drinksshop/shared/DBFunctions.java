@@ -17,6 +17,8 @@ public interface DBFunctions extends Remote {
 
     public List<StockLevels> getStockLevels() throws SQLException, RemoteException;
 
+    public List<ClientOrderHistory> clientGetOrderHistory(int customer_id) throws SQLException, RemoteException;
+
     public boolean addNewCustomer(String customer_email, String customer_name, String customer_phone, String customer_password) throws SQLException, RemoteException;
 
     public boolean addNewBranch(String branch_name) throws SQLException, RemoteException;

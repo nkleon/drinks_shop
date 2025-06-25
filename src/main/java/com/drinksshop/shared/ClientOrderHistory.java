@@ -1,25 +1,24 @@
 package com.drinksshop.shared;
 
-
 import java.io.Serializable;
 import java.time.LocalDate;
 
-public class OrdersRecords implements Serializable {
-    private int orderID;
-    private LocalDate orderDate;
-    private String branchName;
-    private String customerName;
-    private String drinkName;
-    private int orderQuantity;
-    private int totalPrice;
+public class ClientOrderHistory implements Serializable {
+    public int orderID;
+    public LocalDate orderDate;
+    public String branchName;
+    public String drinkName;
+    public int orderQuantity;
+    public int drinkPrice;
+    public int totalPrice;
 
-    public OrdersRecords(int orderID, LocalDate orderDate, String branchName, String customerName, String drinkName, int orderQuantity, int totalPrice) {
+    public ClientOrderHistory(int orderID, LocalDate orderDate, String branchName, String drinkName, int orderQuantity, int drinkPrice, int totalPrice) {
         this.orderID = orderID;
         this.orderDate = orderDate;
         this.branchName = branchName;
-        this.customerName = customerName;
         this.drinkName = drinkName;
         this.orderQuantity = orderQuantity;
+        this.drinkPrice = drinkPrice;
         this.totalPrice = totalPrice;
     }
 
@@ -35,16 +34,16 @@ public class OrdersRecords implements Serializable {
         return branchName;
     }
 
-    public String getCustomerName() {
-        return customerName;
-    }
-
     public String getDrinkName() {
         return drinkName;
     }
 
     public int getOrderQuantity() {
         return orderQuantity;
+    }
+
+    public int getDrinkPrice() {
+        return drinkPrice;
     }
 
     public int getTotalPrice() {

@@ -1,6 +1,8 @@
 package com.drinksshop.shared;
 
-public class SalesByBranch {
+import java.io.Serializable;
+
+public class SalesByBranch implements Serializable {
     private int branchID;
     private String branchName;
     private int branchOrderQuantity;
