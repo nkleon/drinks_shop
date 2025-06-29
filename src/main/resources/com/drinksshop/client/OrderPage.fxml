@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="com.drinksshop.client.OrderPageController">
+    <children>
+        <Label layoutX="170.0" layoutY="35.0" text="Order a drink from your current branch">
+            <font>
+                <Font name="System Bold" size="14.0" />
+            </font>
+        </Label>
+        <Label layoutX="269.0" layoutY="80.0" text="Select drink" />
+        <ComboBox fx:id="cBoxDrinkName" layoutX="225.0" layoutY="117.0" onAction="#onSelectDrink" prefWidth="150.0" />
+        <Label layoutX="101.0" layoutY="177.0" text="Drink ID" />
+        <TextField fx:id="txtDrinkID" editable="false" layoutX="156.0" layoutY="173.0" prefHeight="26.0" prefWidth="43.0" />
+        <Label layoutX="209.0" layoutY="177.0" text="Price" />
+        <TextField fx:id="txtDrinkPrice" editable="false" layoutX="247.0" layoutY="173.0" prefHeight="26.0" prefWidth="78.0" />
+        <Label layoutX="334.0" layoutY="177.0" text="Available stock" />
+        <TextField fx:id="txtAvailableStock" editable="false" layoutX="423.0" layoutY="173.0" prefHeight="26.0" prefWidth="60.0" />
+        <Label layoutX="203.0" layoutY="236.0" text="Your order quantity" />
+        <TextField fx:id="txtOrderQuantity" layoutX="325.0" layoutY="232.0" onKeyTyped="#onSelectQuantity" prefHeight="26.0" prefWidth="70.0" />
+        <Label layoutX="206.0" layoutY="282.0" text="Total" />
+        <TextField fx:id="txtTotalCost" layoutX="245.0" layoutY="278.0" />
+        <Button layoutX="195.0" layoutY="323.0" mnemonicParsing="false" onAction="#goToCustomerLanding" text="Go back" />
+        <Button layoutX="336.0" layoutY="323.0" mnemonicParsing="false" onAction="#makeDrinkOrder" text="Make order" />
+    </children>
+</AnchorPane>

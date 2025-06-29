@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Hyperlink?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.drinksshop.client.RegisterScreenController">
+    <children>
+        <Label layoutX="67.0" layoutY="38.0" text="Dear customer, please register to the drinks shop in order to use our services">
+            <font>
+                <Font name="System Bold" size="13.0" />
+            </font>
+        </Label>
+        <Label layoutX="163.0" layoutY="91.0" text="Name" />
+        <Label layoutX="154.0" layoutY="257.0" text="Password" />
+        <Label layoutX="163.0" layoutY="204.0" text="E-mail" />
+        <Label layoutX="162.0" layoutY="146.0" text="Phone" />
+        <TextField fx:id="customer_name" layoutX="258.0" layoutY="87.0" />
+        <TextField fx:id="customer_phone" layoutX="256.0" layoutY="142.0" />
+        <TextField fx:id="customer_email" layoutX="258.0" layoutY="200.0" />
+        <TextField fx:id="customer_password" layoutX="258.0" layoutY="253.0" />
+        <Hyperlink layoutX="239.0" layoutY="289.0" text="Return to login screen" onAction="#goToLoginScreen"/>
+        <Button fx:id="btn_register" layoutX="272.0" layoutY="324.0" mnemonicParsing="false" text="Register" onAction="#registerNewCustomer"/>
+    </children>
+</AnchorPane>
