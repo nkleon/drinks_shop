@@ -342,4 +342,40 @@ public class DBFunctionsImplementation extends UnicastRemoteObject implements DB
         connection.close();
         return arrayList;
     }
+
+    @Override
+    public boolean restockDrink(int drinkId, int branchId, int quantity) throws RemoteException {
+        boolean success=false;
+        try(
+                Connection conn=DatabaseConnection.getConnection();
+                PreparedStatement stmt=conn.prepareStatement("UPDATE stock SET drink_stock=drink_stock + ?" +
+                        " WHERE drink_id=? AND branch_id=?")) {
+            stmt.setInt(1, quantity);
+            stmt.setInt(2, drinkId);
+            stmt.setInt(3, branchId);
+            int updatedRows = stmt.executeUpdate();
+            success = updatedRows > 0;
+        }catch(SQLException e){
+                    throw new RemoteException("Error restocking drink",e);
+        }
+        return success;
+
+
+
+    }
+    @Override
+    public boolean addNewAdmin(String adminName, String adminPassword) throws RemoteException {
+        boolean executedSuccessfully = false;
+        try (
+                Connection conn = DatabaseConnection.getConnection();
+                PreparedStatement ps = conn.prepareStatement("INSERT INTO admins (admin_name, admin_password) VALUES (?,?)")
+        ) {
+            ps.setString(1, adminName);
+            ps.setString(2, adminPassword); // plaintext for demo; use hashing for real apps!
+            executedSuccessfully = ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            throw new RemoteException("Failed to add admin: " + e.getMessage(), e);
+        }
+        return executedSuccessfully;
+    }
 }

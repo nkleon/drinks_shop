@@ -36,4 +36,8 @@ public interface DBFunctions extends Remote {
     public ArrayList<Integer> getIntegerColumn(String field_name, String table_name, String conditions) throws SQLException, RemoteException;
 
     public ArrayList<String> getStringColumn(String field_name, String table_name, String conditions) throws SQLException, RemoteException;
+
+    public boolean restockDrink(int drinkId,int branchId,int quantity) throws RemoteException;
+
+    public boolean addNewAdmin(String adminName, String adminPassword) throws RemoteException;
 }
