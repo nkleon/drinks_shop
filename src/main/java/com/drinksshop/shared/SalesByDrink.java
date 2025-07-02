@@ -3,20 +3,20 @@ package com.drinksshop.shared;
 import java.io.Serializable;
 
 public class SalesByDrink implements Serializable {
-    private int drinkID;
+    private int drinkId;
     private String drinkName;
     private int drinkOrderQuantity;
-    private int drinkTotalSales;
+    private double drinkTotalSales;
 
-    public SalesByDrink(int drinkID, String drinkName, int drinkOrderQuantity, int drinkTotalSales){
-        this.drinkID = drinkID;
+    public SalesByDrink(int drinkId, String drinkName, int drinkOrderQuantity, double drinkTotalSales) {
+        this.drinkId = drinkId;
         this.drinkName = drinkName;
         this.drinkOrderQuantity = drinkOrderQuantity;
         this.drinkTotalSales = drinkTotalSales;
     }
 
-    public int getDrinkId(){ return drinkID; }
-    public String getDrinkName(){ return drinkName; }
-    public int getDrinkOrderQuantity(){ return drinkOrderQuantity; }
-    public int getDrinkTotalSales(){ return drinkTotalSales; }
+    public int getDrinkId() { return drinkId; }
+    public String getDrinkName() { return drinkName; }
+    public int getDrinkOrderQuantity() { return drinkOrderQuantity; }
+    public double getDrinkTotalSales() { return drinkTotalSales; }
 }

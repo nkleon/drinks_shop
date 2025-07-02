@@ -1,18 +1,19 @@
 package com.drinksshop.client;
 
-import com.drinksshop.shared.DBFunctions;
-import com.drinksshop.shared.SalesByBranch;
-import com.drinksshop.shared.StockLevels;
+import com.drinksshop.shared.*;
+import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.*;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.time.LocalDate;
 import java.util.List;
 
 public class AdminClientFX {
@@ -27,20 +28,31 @@ public class AdminClientFX {
     private TableView<StockLevels> stockTable;
     private ObservableList<StockLevels> stockData;
 
+    // Sales Order Table
+    private TableView<SalesOrderReport> salesOrderTable;
+    private ObservableList<SalesOrderReport> salesOrderData;
+
+    // Low Stock Table
+    private TableView<StockAlert> stockAlertTable;
+    private ObservableList<StockAlert> stockAlertData;
+
     // Restock fields
     private TextField drinkIdField;
     private TextField branchIdField;
     private TextField quantityField;
     private Label restockStatusLabel;
 
-
+    // Add Admin fields
     private TextField adminNameField;
     private PasswordField adminPasswordField;
     private Label addAdminStatusLabel;
 
+    // Total sales label
+    private Label totalSalesLabel = new Label();
+
     public AdminClientFX() throws Exception {
-        // Connecting to RMI
-        Registry registry = LocateRegistry.getRegistry("localhost", 10800); // Change to server IP if needed
+        // Connect to RMI
+        Registry registry = LocateRegistry.getRegistry("localhost", 10800);
         db = (DBFunctions) registry.lookup("DBFunctions");
     }
 
@@ -59,11 +71,74 @@ public class AdminClientFX {
         Tab addAdminTab = new Tab("Add Admin", createAddAdminPane());
         addAdminTab.setClosable(false);
 
-        tabPane.getTabs().addAll(viewReportTab, restockTab, viewStockTab, addAdminTab);
+        Tab salesOrderTab = new Tab("Sales by Order", createSalesOrderPane());
+        salesOrderTab.setClosable(false);
+
+        Tab stockAlertTab = new Tab("Low Stock Alerts", createStockAlertPane());
+        stockAlertTab.setClosable(false);
+
+        Tab totalSalesTab = new Tab("Total Sales", createTotalSalesPane());
+        totalSalesTab.setClosable(false);
+
+        tabPane.getTabs().addAll(
+                viewReportTab, restockTab, viewStockTab, addAdminTab,
+                salesOrderTab, stockAlertTab, totalSalesTab
+        );
 
         return tabPane;
     }
+    private VBox createSalesOrderPane() {
+        TableView<SalesOrderReport> orderTable = new TableView<>();
+        ObservableList<SalesOrderReport> orderData = FXCollections.observableArrayList();
 
+        TableColumn<SalesOrderReport, Integer> idCol = new TableColumn<>("Order ID");
+        idCol.setCellValueFactory(new PropertyValueFactory<>("orderId"));
+
+        TableColumn<SalesOrderReport, LocalDate> dateCol = new TableColumn<>("Date");
+        dateCol.setCellValueFactory(new PropertyValueFactory<>("orderDate"));
+
+        TableColumn<SalesOrderReport, String> customerCol = new TableColumn<>("Customer");
+        customerCol.setCellValueFactory(new PropertyValueFactory<>("customerName"));
+
+        TableColumn<SalesOrderReport, String> emailCol = new TableColumn<>("Email");
+        emailCol.setCellValueFactory(new PropertyValueFactory<>("customerEmail"));
+
+        TableColumn<SalesOrderReport, String> branchCol = new TableColumn<>("Branch");
+        branchCol.setCellValueFactory(new PropertyValueFactory<>("branchName"));
+
+        TableColumn<SalesOrderReport, String> drinkCol = new TableColumn<>("Drink");
+        drinkCol.setCellValueFactory(new PropertyValueFactory<>("drinkName"));
+
+        TableColumn<SalesOrderReport, Integer> qtyCol = new TableColumn<>("Quantity");
+        qtyCol.setCellValueFactory(new PropertyValueFactory<>("orderQuantity"));
+
+        TableColumn<SalesOrderReport, Double> amountCol = new TableColumn<>("Amount");
+        amountCol.setCellValueFactory(new PropertyValueFactory<>("orderAmount"));
+
+        orderTable.getColumns().addAll(idCol, dateCol, customerCol, emailCol, branchCol, drinkCol, qtyCol, amountCol);
+        orderTable.setItems(orderData);
+
+        Button refreshBtn = new Button("Refresh");
+        refreshBtn.setOnAction(e -> {
+            orderData.clear();
+            try {
+                List<SalesOrderReport> list = db.getSalesOrderReport();
+                orderData.addAll(list);
+            } catch (Exception ex) {
+                showError("Could not load sales order data:\n" + ex.getMessage());
+            }
+        });
+
+        VBox vbox = new VBox(10, orderTable, refreshBtn);
+        vbox.setPadding(new Insets(10));
+
+        // Optionally, load data on pane creation
+        refreshBtn.fire();
+
+        return vbox;
+    }
+
+    // 1. Sales by Branch
     private VBox createBranchTablePane() {
         branchTable = new TableView<>();
         branchData = FXCollections.observableArrayList();
@@ -77,7 +152,7 @@ public class AdminClientFX {
         TableColumn<SalesByBranch, Integer> ordersCol = new TableColumn<>("Total Orders");
         ordersCol.setCellValueFactory(new PropertyValueFactory<>("branchOrderQuantity"));
 
-        TableColumn<SalesByBranch, Integer> salesCol = new TableColumn<>("Total Sales");
+        TableColumn<SalesByBranch, Double> salesCol = new TableColumn<>("Total Sales");
         salesCol.setCellValueFactory(new PropertyValueFactory<>("branchTotalSales"));
 
         branchTable.getColumns().addAll(idCol, nameCol, ordersCol, salesCol);
@@ -103,6 +178,141 @@ public class AdminClientFX {
         }
     }
 
+    // 2. Sales by Order (with customer and branch info)
+    private TableView<SalesOrderReport> orderTable;
+    private ObservableList<SalesOrderReport> orderData;
+
+    private VBox createOrderTablePane() {
+        orderTable = new TableView<>();
+        orderData = FXCollections.observableArrayList();
+
+        TableColumn<SalesOrderReport, Integer> idCol = new TableColumn<>("Order ID");
+        idCol.setCellValueFactory(new PropertyValueFactory<>("orderId"));
+
+        TableColumn<SalesOrderReport, LocalDate> dateCol = new TableColumn<>("Date");
+        dateCol.setCellValueFactory(new PropertyValueFactory<>("orderDate"));
+
+        TableColumn<SalesOrderReport, String> customerCol = new TableColumn<>("Customer");
+        customerCol.setCellValueFactory(new PropertyValueFactory<>("customerName"));
+
+        TableColumn<SalesOrderReport, String> emailCol = new TableColumn<>("Email");
+        emailCol.setCellValueFactory(new PropertyValueFactory<>("customerEmail"));
+
+        TableColumn<SalesOrderReport, String> branchCol = new TableColumn<>("Branch");
+        branchCol.setCellValueFactory(new PropertyValueFactory<>("branchName"));
+
+        TableColumn<SalesOrderReport, String> drinkCol = new TableColumn<>("Drink");
+        drinkCol.setCellValueFactory(new PropertyValueFactory<>("drinkName"));
+
+        TableColumn<SalesOrderReport, Integer> qtyCol = new TableColumn<>("Quantity");
+        qtyCol.setCellValueFactory(new PropertyValueFactory<>("orderQuantity"));
+
+        TableColumn<SalesOrderReport, Double> amountCol = new TableColumn<>("Amount");
+        amountCol.setCellValueFactory(new PropertyValueFactory<>("orderAmount"));
+
+        orderTable.getColumns().addAll(idCol, dateCol, customerCol, emailCol, branchCol, drinkCol, qtyCol, amountCol);
+        orderTable.setItems(orderData);
+
+        Button refreshBtn = new Button("Refresh");
+        refreshBtn.setOnAction(e -> loadOrderData());
+
+        VBox vbox = new VBox(10, orderTable, refreshBtn);
+        vbox.setPadding(new Insets(10));
+
+        loadOrderData();
+
+        return vbox;
+    }
+    private void loadOrderData() {
+        orderData.clear();
+        try {
+            List<SalesOrderReport> list = db.getSalesOrderReport();
+            orderData.addAll(list);
+        } catch (Exception e) {
+            showError("Could not load sales order data:\n" + e.getMessage());
+        }
+    }
+    private void showError(String message) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Error");
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
+
+    private void loadSalesOrderData() {
+        try {
+            List<SalesOrderReport> report = db.getSalesOrderReport();
+            salesOrderData.setAll(report);
+        } catch (Exception e) {
+            showAlert("Error", "Failed to load sales order data: " + e.getMessage());
+        }
+    }
+
+    // 3. Low Stock Alerts
+    private VBox createStockAlertPane() {
+        TableView<StockAlert> stockAlertTable = new TableView<>();
+        ObservableList<StockAlert> stockAlertData = FXCollections.observableArrayList();
+
+        stockAlertTable.setItems(stockAlertData);
+
+        TableColumn<StockAlert, String> drinkCol = new TableColumn<>("Drink");
+        drinkCol.setCellValueFactory(new PropertyValueFactory<>("drinkName"));
+
+        TableColumn<StockAlert, String> branchCol = new TableColumn<>("Branch");
+        branchCol.setCellValueFactory(new PropertyValueFactory<>("branchName"));
+
+        TableColumn<StockAlert, Integer> stockCol = new TableColumn<>("Stock");
+        stockCol.setCellValueFactory(new PropertyValueFactory<>("stockLevel"));
+
+        TableColumn<StockAlert, Integer> thresholdCol = new TableColumn<>("Threshold");
+        thresholdCol.setCellValueFactory(new PropertyValueFactory<>("threshold"));
+
+        stockAlertTable.getColumns().addAll(drinkCol, branchCol, stockCol, thresholdCol);
+
+        Button refreshBtn = new Button("Refresh");
+        refreshBtn.setOnAction(e -> loadStockAlertData(stockAlertData));
+
+        VBox vbox = new VBox(10, stockAlertTable, refreshBtn);
+        vbox.setPadding(new Insets(10));
+
+        loadStockAlertData(stockAlertData);
+
+        return vbox;
+    }
+
+    // Sample loader method
+    private void loadStockAlertData(ObservableList<StockAlert> stockAlertData) {
+        stockAlertData.clear();
+        try {
+            // Replace with your RMI/db fetch logic:
+            List<StockAlert> list = db.getStockAlerts();
+            stockAlertData.addAll(list);
+        } catch (Exception e) {
+            showError("Could not load stock alert data:\n" + e.getMessage());
+        }
+    }
+
+    
+
+    // 4. Total Sales Report
+    private VBox createTotalSalesPane() {
+        VBox vbox = new VBox(10, totalSalesLabel);
+        vbox.setPadding(new Insets(20));
+        updateTotalSales();
+        return vbox;
+    }
+
+    private void updateTotalSales() {
+        try {
+            double total = db.getTotalSales();
+            totalSalesLabel.setText("Total Sales: $" + String.format("%.2f", total));
+        } catch (Exception e) {
+            totalSalesLabel.setText("Total Sales: error");
+        }
+    }
+
+    // 5. Stock Table (existing)
     private VBox createStockPane() {
         stockTable = new TableView<>();
         stockData = FXCollections.observableArrayList();
@@ -139,6 +349,7 @@ public class AdminClientFX {
         }
     }
 
+    // Restock
     private VBox createRestockPane() {
         drinkIdField = new TextField();
         drinkIdField.setPromptText("Drink ID");
@@ -181,6 +392,7 @@ public class AdminClientFX {
                 restockStatusLabel.setText("Restock successful!");
                 restockStatusLabel.setStyle("-fx-text-fill: green;");
                 loadStockData();
+                loadStockAlertData(stockAlertData);
             } else {
                 restockStatusLabel.setText("Restock failed.");
                 restockStatusLabel.setStyle("-fx-text-fill: red;");
@@ -194,6 +406,7 @@ public class AdminClientFX {
         }
     }
 
+    // Add Admin
     private VBox createAddAdminPane() {
         adminNameField = new TextField();
         adminNameField.setPromptText("Admin Name");

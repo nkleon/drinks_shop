@@ -3,20 +3,20 @@ package com.drinksshop.shared;
 import java.io.Serializable;
 
 public class SalesByCustomer implements Serializable {
-    private int customerID;
+    private int customerId;
     private String customerName;
     private int customerOrderQuantity;
-    private int customerTotalPurchases;
+    private double customerTotalPurchases;
 
-    public SalesByCustomer(int customerID, String customerName, int customerOrderQuantity, int customerTotalPurchases){
-        this.customerID = customerID;
+    public SalesByCustomer(int customerId, String customerName, int customerOrderQuantity, double customerTotalPurchases) {
+        this.customerId = customerId;
         this.customerName = customerName;
         this.customerOrderQuantity = customerOrderQuantity;
         this.customerTotalPurchases = customerTotalPurchases;
     }
 
-    public int getCustomerID(){ return customerID; }
-    public String getCustomerName(){ return customerName; }
-    public int getCustomerOrderQuantity(){ return customerOrderQuantity; }
-    public int getCustomerTotalPurchases(){ return customerTotalPurchases; }
+    public int getCustomerId() { return customerId; }
+    public String getCustomerName() { return customerName; }
+    public int getCustomerOrderQuantity() { return customerOrderQuantity; }
+    public double getCustomerTotalPurchases() { return customerTotalPurchases; }
 }

@@ -3,20 +3,20 @@ package com.drinksshop.shared;
 import java.io.Serializable;
 
 public class SalesByBranch implements Serializable {
-    private int branchID;
+    private int branchId;
     private String branchName;
     private int branchOrderQuantity;
-    private int branchTotalSales;
+    private double branchTotalSales;
 
-    public SalesByBranch(int branchID, String branchName, int branchOrderQuantity, int branchTotalSales){
-        this.branchID = branchID;
+    public SalesByBranch(int branchId, String branchName, int branchOrderQuantity, double branchTotalSales) {
+        this.branchId = branchId;
         this.branchName = branchName;
         this.branchOrderQuantity = branchOrderQuantity;
         this.branchTotalSales = branchTotalSales;
     }
 
-    public int getBranchID(){ return branchID; }
-    public String getBranchName(){ return branchName; }
-    public int getBranchOrderQuantity(){ return branchOrderQuantity; }
-    public int getBranchTotalSales(){ return branchTotalSales; }
+    public int getBranchId() { return branchId; }
+    public String getBranchName() { return branchName; }
+    public int getBranchOrderQuantity() { return branchOrderQuantity; }
+    public double getBranchTotalSales() { return branchTotalSales; }
 }

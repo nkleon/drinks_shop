@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox spacing="10" padding="10" xmlns:fx="http://javafx.com/fxml" fx:controller="com.drinksshop.client.SalesOrderReportController">
+    <TableView fx:id="salesOrderTable">
+        <columns>
+            <TableColumn fx:id="orderIdCol" text="Order ID"/>
+            <TableColumn fx:id="orderDateCol" text="Date"/>
+            <TableColumn fx:id="customerEmailCol" text="Customer Email"/>
+            <TableColumn fx:id="branchNameCol" text="Branch"/>
+            <TableColumn fx:id="drinkNameCol" text="Drink"/>
+            <TableColumn fx:id="orderQuantityCol" text="Quantity"/>
+        </columns>
+    </TableView>
+    <Button text="Refresh" onAction="#onRefreshSalesOrder"/>
+</VBox>

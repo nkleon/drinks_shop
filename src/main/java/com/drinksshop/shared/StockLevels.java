@@ -13,15 +13,7 @@ public class StockLevels implements Serializable {
         this.drinkStock = drinkStock;
     }
 
-    public String getDrinkName() {
-        return drinkName;
-    }
-
-    public String getBranchName() {
-        return branchName;
-    }
-
-    public int getDrinkStock() {
-        return drinkStock;
-    }
+    public String getDrinkName() { return drinkName; }
+    public String getBranchName() { return branchName; }
+    public int getDrinkStock() { return drinkStock; }
 }
