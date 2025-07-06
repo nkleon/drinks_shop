@@ -209,14 +209,20 @@ public class DBFunctionsImplementation extends UnicastRemoteObject implements DB
 
     @Override
     public boolean addNewDrink(String drink_name, int drink_price) throws SQLException, RemoteException {
-        String sql = "INSERT INTO drinks (drink_name, drink_price) VALUES (?,?)";
+        String sql = "INSERT INTO drinks (drink_name, drink_price) VALUES (?,?);";
+        String sql2 = "INSERT INTO stock (branch_id, drink_id, drink_stock) SELECT branch_id, (SELECT drink_id from drinks where drink_name = ?), 0 FROM branches;";
         try (
                 Connection connection = DatabaseConnection.getConnection();
-                PreparedStatement preparedStatement = connection.prepareStatement(sql)
+                PreparedStatement preparedStatement = connection.prepareStatement(sql);
+                PreparedStatement preparedStatement2 = connection.prepareStatement(sql2);
+
         ) {
             preparedStatement.setString(1, drink_name);
             preparedStatement.setInt(2, drink_price);
-            return preparedStatement.executeUpdate() > 0;
+            preparedStatement2.setString(1, drink_name);
+
+            System.out.println(preparedStatement2);
+            return (preparedStatement.executeUpdate() > 0 && preparedStatement2.executeUpdate() > 0);
         }
     }
 

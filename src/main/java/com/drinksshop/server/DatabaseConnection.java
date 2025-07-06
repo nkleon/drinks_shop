@@ -29,7 +29,4 @@ public class DatabaseConnection {
     public static Connection getConnection() throws SQLException{
         return DriverManager.getConnection(databaseURL,databaseUsername,databasePassword);
     }
-
-
-
 }

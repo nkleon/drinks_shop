@@ -24,6 +24,9 @@ public class AdminClientFX {
     private TableView<SalesByBranch> branchTable;
     private ObservableList<SalesByBranch> branchData;
 
+    private TableView<SalesByDrink> drinksTable;
+    private ObservableList<SalesByDrink> drinksData;
+
     // Stock Table
     private TableView<StockLevels> stockTable;
     private ObservableList<StockLevels> stockData;
@@ -41,6 +44,12 @@ public class AdminClientFX {
     private TextField branchIdField;
     private TextField quantityField;
     private Label restockStatusLabel;
+
+    //Add Drink fields
+
+    private TextField txtNewDrinkName, txtNewDrinkPrice;
+    private Label lblNewDrinkName, lblNewDrinkPrice;
+
 
     // Add Admin fields
     private TextField adminNameField;
@@ -62,6 +71,15 @@ public class AdminClientFX {
         Tab viewReportTab = new Tab("View Sales by Branch", createBranchTablePane());
         viewReportTab.setClosable(false);
 
+        Tab viewDrinksTab = new Tab("View Sales by Drink", createDrinkTablePane());
+        viewDrinksTab.setClosable(false);
+
+        Tab salesOrderTab = new Tab("Sales by Customer", createSalesOrderPane());
+        salesOrderTab.setClosable(false);
+
+        Tab newDrinkTab = new Tab("Add new drink", createAddDrinkPane());
+        newDrinkTab.setClosable(false);
+
         Tab restockTab = new Tab("Restock Drink", createRestockPane());
         restockTab.setClosable(false);
 
@@ -71,9 +89,6 @@ public class AdminClientFX {
         Tab addAdminTab = new Tab("Add Admin", createAddAdminPane());
         addAdminTab.setClosable(false);
 
-        Tab salesOrderTab = new Tab("Sales by Order", createSalesOrderPane());
-        salesOrderTab.setClosable(false);
-
         Tab stockAlertTab = new Tab("Low Stock Alerts", createStockAlertPane());
         stockAlertTab.setClosable(false);
 
@@ -81,8 +96,8 @@ public class AdminClientFX {
         totalSalesTab.setClosable(false);
 
         tabPane.getTabs().addAll(
-                viewReportTab, restockTab, viewStockTab, addAdminTab,
-                salesOrderTab, stockAlertTab, totalSalesTab
+                viewReportTab, viewDrinksTab, salesOrderTab, newDrinkTab, restockTab, viewStockTab, addAdminTab,
+                stockAlertTab, totalSalesTab
         );
 
         return tabPane;
@@ -173,6 +188,45 @@ public class AdminClientFX {
         try {
             List<SalesByBranch> report = db.getSalesByBranch();
             branchData.setAll(report);
+        } catch (Exception e) {
+            showAlert("Error", "Failed to load branch data: " + e.getMessage());
+        }
+    }
+
+    private VBox createDrinkTablePane() {
+        drinksTable = new TableView<>();
+        drinksData = FXCollections.observableArrayList();
+
+        TableColumn<SalesByDrink, Integer> idCol = new TableColumn<>("Drink ID");
+        idCol.setCellValueFactory(new PropertyValueFactory<>("drinkId"));
+
+        TableColumn<SalesByDrink, String> nameCol = new TableColumn<>("Drink Name");
+        nameCol.setCellValueFactory(new PropertyValueFactory<>("drinkName"));
+
+        TableColumn<SalesByDrink, Integer> ordersCol = new TableColumn<>("Total Orders");
+        ordersCol.setCellValueFactory(new PropertyValueFactory<>("drinkOrderQuantity"));
+
+        TableColumn<SalesByDrink, Integer> salesCol = new TableColumn<>("Total Sales");
+        salesCol.setCellValueFactory(new PropertyValueFactory<>("drinkTotalSales"));
+
+        drinksTable.getColumns().addAll(idCol, nameCol, ordersCol, salesCol);
+        drinksTable.setItems(drinksData);
+
+        Button refreshBtn = new Button("Refresh");
+        refreshBtn.setOnAction(e -> loadDrinkData());
+
+        VBox vbox = new VBox(10, drinksTable, refreshBtn);
+        vbox.setPadding(new Insets(10));
+
+        loadDrinkData();
+
+        return vbox;
+    }
+
+    private void loadDrinkData() {
+        try {
+            List<SalesByDrink> report = db.getSalesByDrink();
+            drinksData.setAll(report);
         } catch (Exception e) {
             showAlert("Error", "Failed to load branch data: " + e.getMessage());
         }
@@ -392,6 +446,7 @@ public class AdminClientFX {
                 restockStatusLabel.setText("Restock successful!");
                 restockStatusLabel.setStyle("-fx-text-fill: green;");
                 loadStockData();
+                ObservableList<StockAlert> stockAlertData = FXCollections.observableArrayList();
                 loadStockAlertData(stockAlertData);
             } else {
                 restockStatusLabel.setText("Restock failed.");
@@ -403,6 +458,7 @@ public class AdminClientFX {
         } catch (Exception e) {
             restockStatusLabel.setText("Error: " + e.getMessage());
             restockStatusLabel.setStyle("-fx-text-fill: red;");
+            e.printStackTrace();
         }
     }
 
@@ -453,6 +509,66 @@ public class AdminClientFX {
         } catch (Exception e) {
             addAdminStatusLabel.setText("Error: " + e.getMessage());
             addAdminStatusLabel.setStyle("-fx-text-fill: red;");
+        }
+    }
+
+    private VBox createAddDrinkPane() {
+        txtNewDrinkName = new TextField();
+        txtNewDrinkName.setPromptText("New Drink Name");
+
+        txtNewDrinkPrice = new TextField();
+        txtNewDrinkPrice.setPromptText("New Drink Price");
+
+        TextFormatter<String> numericFormatter = new TextFormatter<>(change -> {
+            String newText = change.getControlNewText();
+            if (newText.matches("[1-9][0-9]*") || newText.isEmpty()) {
+                return change;
+            } else {
+                return null;
+            }
+        });
+
+        txtNewDrinkPrice.setTextFormatter(numericFormatter);
+
+        Button addBtn = new Button("Add Drink");
+        lblNewDrinkName = new Label();
+
+        addBtn.setOnAction(e -> handleAddDrink());
+
+        GridPane grid = new GridPane();
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.add(new Label("Drink Name:"), 0, 0);
+        grid.add(txtNewDrinkName, 1, 0);
+        grid.add(new Label("Drink price:"), 0, 1);
+        grid.add(txtNewDrinkPrice, 1, 1);
+        grid.add(addBtn, 1, 2);
+
+        VBox vbox = new VBox(10, grid, lblNewDrinkName);
+        vbox.setPadding(new Insets(20));
+        return vbox;
+    }
+
+    private void handleAddDrink() {
+        if (txtNewDrinkName.getLength() == 0 || txtNewDrinkPrice.getLength() == 0) {
+            lblNewDrinkName.setText("Both fields required.");
+            lblNewDrinkName.setStyle("-fx-text-fill: red;");
+            return;
+        }
+        try {
+            String newDrinkName = txtNewDrinkName.getText();
+            int newDrinkPrice = Integer.parseInt(txtNewDrinkPrice.getText());
+            boolean ok = db.addNewDrink(newDrinkName, newDrinkPrice);
+            if (ok) {
+                lblNewDrinkName.setText("Drink added!");
+                lblNewDrinkName.setStyle("-fx-text-fill: green;");
+            } else {
+                lblNewDrinkName.setText("Failed to add drink.");
+                lblNewDrinkName.setStyle("-fx-text-fill: red;");
+            }
+        } catch (Exception e) {
+            lblNewDrinkName.setText("Error: " + e.getMessage());
+            lblNewDrinkName.setStyle("-fx-text-fill: red;");
         }
     }
 

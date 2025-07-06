@@ -45,15 +45,17 @@ public class OrderPageController {
 
     public void onSelectDrink(ActionEvent actionEvent){
         try {
-            String drinkname = cBoxDrinkName.getValue();
-            int drinkID = ServerConnection.dbFunctions().getIntegerColumn("drink_id", "drinks", "drink_name = '" + drinkname+"'").get(0);
-            txtDrinkID.setText(String.valueOf(drinkID));
-            int drinkPrice = ServerConnection.dbFunctions().getIntegerColumn("drink_price", "drinks", "drink_id = " + drinkID).get(0);
-            txtDrinkPrice.setText(String.valueOf(drinkPrice));
-            int availableStock = ServerConnection.dbFunctions().getIntegerColumn("drink_stock", "stock", "branch_id = "+GlobalVariables.branch_id).get(0);
-            txtAvailableStock.setText(String.valueOf(availableStock));
-            if (txtOrderQuantity.getLength() > 0){
-                txtTotalCost.setText(String.valueOf((Integer.parseInt(txtDrinkPrice.getText()) * Integer.parseInt(txtOrderQuantity.getText()))));
+            if (cBoxDrinkName.getValue() != null){
+                String drinkname = cBoxDrinkName.getValue();
+                int drinkID = ServerConnection.dbFunctions().getIntegerColumn("drink_id", "drinks", "drink_name = '" + drinkname+"'").get(0);
+                txtDrinkID.setText(String.valueOf(drinkID));
+                int drinkPrice = ServerConnection.dbFunctions().getIntegerColumn("drink_price", "drinks", "drink_id = " + drinkID).get(0);
+                txtDrinkPrice.setText(String.valueOf(drinkPrice));
+                int availableStock = ServerConnection.dbFunctions().getIntegerColumn("drink_stock", "stock", "branch_id = "+GlobalVariables.branch_id+" AND drink_id = "+drinkID).get(0);
+                txtAvailableStock.setText(String.valueOf(availableStock));
+                if (txtOrderQuantity.getLength() > 0){
+                    txtTotalCost.setText(String.valueOf((Integer.parseInt(txtDrinkPrice.getText()) * Integer.parseInt(txtOrderQuantity.getText()))));
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -108,6 +110,8 @@ public class OrderPageController {
                         alert.setTitle("Success!");
                         alert.setContentText("Order made successfully");
                         alert.showAndWait();
+                        clearItems();
+                        initialize();
                     } else {
                         Alert alert = new Alert(Alert.AlertType.ERROR);
                         alert.setTitle("Failure!");
@@ -123,5 +127,14 @@ public class OrderPageController {
                 }
             }
         }
+    }
+
+    public void clearItems(){
+        cBoxDrinkName.getItems().clear();
+        txtDrinkID.clear();
+        txtDrinkPrice.clear();
+        txtAvailableStock.clear();
+        txtOrderQuantity.clear();
+        txtTotalCost.clear();
     }
 }

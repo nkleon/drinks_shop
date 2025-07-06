@@ -34,7 +34,7 @@ public class ClientOrderHistoryController {
 
     public void initialize(){
         try{
-            colOrderID.setCellValueFactory(new PropertyValueFactory<>("orderID"));
+            colOrderID.setCellValueFactory(new PropertyValueFactory<>("orderId"));
             colOrderDate.setCellValueFactory(new PropertyValueFactory<>("orderDate"));
             colBranchName.setCellValueFactory(new PropertyValueFactory<>("branchName"));
             colDrinkName.setCellValueFactory(new PropertyValueFactory<>("drinkName"));
