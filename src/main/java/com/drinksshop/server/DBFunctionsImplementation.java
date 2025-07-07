@@ -39,16 +39,7 @@ public class DBFunctionsImplementation extends UnicastRemoteObject implements DB
         }
         return selections;
     }
-    @Override
-    public List<StockAlert> getStockAlerts() throws RemoteException {
-        // TODO: Replace with your actual logic (e.g., fetch from database)
-        List<StockAlert> alerts = new ArrayList<>();
-        // Example dummy data
-        alerts.add(new StockAlert("Coke", "Nakuru", 5, 10));
-        return alerts;
-    }
-
-    @Override
+   @Override
     public List<SalesByCustomer> getSalesByCustomer() throws SQLException, RemoteException {
         List<SalesByCustomer> selections = new ArrayList<>();
         String query = "SELECT c.customer_id, c.customer_name, SUM(o.order_quantity) AS customer_order_quantity, SUM(o.order_quantity * d.drink_price) AS customer_total_purchases " +
@@ -71,6 +62,26 @@ public class DBFunctionsImplementation extends UnicastRemoteObject implements DB
             }
         }
         return selections;
+    }
+
+//    @Override
+    public List<StockAlert> getStockAlerts() throws RemoteException {
+        List<StockAlert> alerts = new ArrayList<>();
+        String sql = "SELECT name, location, quantity FROM products WHERE quantity < 10";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) {
+                String name = rs.getString("name");
+                String location = rs.getString("location");
+                int quantity = rs.getInt("quantity");
+
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+
+        }
+        return alerts;
     }
 
     @Override
@@ -407,30 +418,36 @@ public class DBFunctionsImplementation extends UnicastRemoteObject implements DB
         return 0;
     }
 
+
     @Override
-    public List<StockAlert> getLowStockAlerts() throws RemoteException {
-        List<StockAlert> alerts = new ArrayList<>();
-        String sql = "SELECT d.drink_name, b.branch_name, s.drink_stock, s.threshold " +
-                "FROM stock s " +
-                "JOIN drinks d ON s.drink_id = d.drink_id " +
-                "JOIN branches b ON s.branch_id = b.branch_id " +
-                "WHERE s.drink_stock < s.threshold";
-        try (
-                Connection conn = DatabaseConnection.getConnection();
-                Statement stmt = conn.createStatement();
-                ResultSet rs = stmt.executeQuery(sql)
-        ) {
+    public List<StockLevels> getLowStockAlerts() throws RemoteException {
+        List<StockLevels> alerts = new ArrayList<>();
+        String sql = "SELECT \n" +
+                "    s.branch_name, \n" +
+                "    d.drink_name, \n" +
+                "    s.drink_stock \n" +
+                "FROM \n" +
+                "    stock s\n" +
+                "JOIN \n" +
+                "    drinks d ON s.drink_id = d.drink_id\n" +
+                "WHERE \n" +
+                "    s.drink_stock < 10;\n";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+
             while (rs.next()) {
-                alerts.add(new StockAlert(
+                alerts.add(new StockLevels(
                         rs.getString("drink_name"),
                         rs.getString("branch_name"),
-                        rs.getInt("drink_stock"),
-                        rs.getInt("threshold")
+                        rs.getInt("drink_stock")
                 ));
             }
         } catch (SQLException e) {
-            throw new RemoteException("Failed to fetch low stock alerts", e);
+            e.printStackTrace();
         }
+
         return alerts;
     }
 }

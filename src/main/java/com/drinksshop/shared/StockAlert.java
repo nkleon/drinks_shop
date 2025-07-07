@@ -3,20 +3,18 @@ package com.drinksshop.shared;
 import java.io.Serializable;
 
 public class StockAlert implements Serializable {
-    private String drinkName;
-    private String branchName;
-    private int stockLevel;
-    private int threshold;
+    private int drinkId;
+    private int branchId;
+    private int drinkStock;
 
-    public StockAlert(String drinkName, String branchName, int stockLevel, int threshold) {
-        this.drinkName = drinkName;
-        this.branchName = branchName;
-        this.stockLevel = stockLevel;
-        this.threshold = threshold;
+
+    public StockAlert(int drinkId, int branchId, int drinkStock) {
+        this.drinkId= drinkId;
+        this.branchId = branchId;
+        this.drinkStock = drinkStock;
     }
 
-    public String getDrinkName() { return drinkName; }
-    public String getBranchName() { return branchName; }
-    public int getStockLevel() { return stockLevel; }
-    public int getThreshold() { return threshold; }
+    public int getdrinkId() { return drinkId; }
+    public int getbranchId() { return branchId; }
+    public int getStockLevel() { return drinkStock; }
 }

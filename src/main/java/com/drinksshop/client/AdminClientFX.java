@@ -1,9 +1,7 @@
 package com.drinksshop.client;
 
 import com.drinksshop.shared.*;
-import javafx.beans.property.SimpleDoubleProperty;
-import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.property.SimpleStringProperty;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
@@ -36,8 +34,8 @@ public class AdminClientFX {
     private ObservableList<SalesOrderReport> salesOrderData;
 
     // Low Stock Table
-    private TableView<StockAlert> stockAlertTable;
-    private ObservableList<StockAlert> stockAlertData;
+    private TableView<StockLevels> stockAlertTable;
+    private ObservableList<StockLevels> stockAlertData;
 
     // Restock fields
     private TextField drinkIdField;
@@ -100,7 +98,9 @@ public class AdminClientFX {
                 stockAlertTab, totalSalesTab
         );
 
+
         return tabPane;
+
     }
     private VBox createSalesOrderPane() {
         TableView<SalesOrderReport> orderTable = new TableView<>();
@@ -304,25 +304,23 @@ public class AdminClientFX {
     }
 
     // 3. Low Stock Alerts
+
     private VBox createStockAlertPane() {
-        TableView<StockAlert> stockAlertTable = new TableView<>();
-        ObservableList<StockAlert> stockAlertData = FXCollections.observableArrayList();
+        TableView<StockLevels> stockAlertTable = new TableView<>();
+        ObservableList<StockLevels> stockAlertData = FXCollections.observableArrayList();
 
         stockAlertTable.setItems(stockAlertData);
 
-        TableColumn<StockAlert, String> drinkCol = new TableColumn<>("Drink");
+        TableColumn<StockLevels, String> drinkCol = new TableColumn<>("Drink");
         drinkCol.setCellValueFactory(new PropertyValueFactory<>("drinkName"));
 
-        TableColumn<StockAlert, String> branchCol = new TableColumn<>("Branch");
+        TableColumn<StockLevels, String> branchCol = new TableColumn<>("Branch");
         branchCol.setCellValueFactory(new PropertyValueFactory<>("branchName"));
 
-        TableColumn<StockAlert, Integer> stockCol = new TableColumn<>("Stock");
-        stockCol.setCellValueFactory(new PropertyValueFactory<>("stockLevel"));
+        TableColumn<StockLevels, Integer> stockCol = new TableColumn<>("Stock");
+        stockCol.setCellValueFactory(new PropertyValueFactory<>("drinkStock")); // Make sure this matches your getter
 
-        TableColumn<StockAlert, Integer> thresholdCol = new TableColumn<>("Threshold");
-        thresholdCol.setCellValueFactory(new PropertyValueFactory<>("threshold"));
-
-        stockAlertTable.getColumns().addAll(drinkCol, branchCol, stockCol, thresholdCol);
+        stockAlertTable.getColumns().addAll(drinkCol, branchCol, stockCol);
 
         Button refreshBtn = new Button("Refresh");
         refreshBtn.setOnAction(e -> loadStockAlertData(stockAlertData));
@@ -335,19 +333,14 @@ public class AdminClientFX {
         return vbox;
     }
 
-    // Sample loader method
-    private void loadStockAlertData(ObservableList<StockAlert> stockAlertData) {
-        stockAlertData.clear();
+    private void loadStockAlertData(ObservableList<StockLevels> stockAlertData) {
         try {
-            // Replace with your RMI/db fetch logic:
-            List<StockAlert> list = db.getStockAlerts();
-            stockAlertData.addAll(list);
+            List<StockLevels> stocks = db.getLowStockAlerts(); // Assuming this returns drinks with stock < 10
+            stockAlertData.setAll(stocks); // Fixed from stockData to stockAlertData
         } catch (Exception e) {
-            showError("Could not load stock alert data:\n" + e.getMessage());
+            showAlert("Error", "Failed to load stock alerts: " + e.getMessage());
         }
     }
-
-    
 
     // 4. Total Sales Report
     private VBox createTotalSalesPane() {
@@ -446,7 +439,7 @@ public class AdminClientFX {
                 restockStatusLabel.setText("Restock successful!");
                 restockStatusLabel.setStyle("-fx-text-fill: green;");
                 loadStockData();
-                ObservableList<StockAlert> stockAlertData = FXCollections.observableArrayList();
+                ObservableList<StockLevels> stockAlertData = FXCollections.observableArrayList();
                 loadStockAlertData(stockAlertData);
             } else {
                 restockStatusLabel.setText("Restock failed.");
