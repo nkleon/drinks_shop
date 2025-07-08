@@ -12,6 +12,7 @@ import javafx.scene.layout.*;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 public class AdminClientFX {
@@ -395,6 +396,27 @@ public class AdminClientFX {
         try {
             List<StockLevels> stocks = db.getStockLevels();
             stockData.setAll(stocks);
+
+            List<StockLevels> lowStockItems = new ArrayList<>();
+            for (StockLevels stockAlertDatum : stockData) {
+                if (stockAlertDatum.getDrinkStock() < 10) {
+                    lowStockItems.add(stockAlertDatum);
+                }
+            }
+
+            if (!lowStockItems.isEmpty()) {
+                StringBuilder alertMsg = new StringBuilder("The following items have low stock (below 10):\n\n");
+                for (StockLevels item : lowStockItems) {
+                    alertMsg.append(String.format("Drink: %s, Branch: %s, Stock: %d%n",
+                            item.getDrinkName(), item.getBranchName(), item.getDrinkStock()));
+                }
+
+                Alert alert = new Alert(Alert.AlertType.WARNING);
+                alert.setTitle("Low Stock Alert");
+                alert.setHeaderText("Stock Levels Below Threshold");
+                alert.setContentText(alertMsg.toString());
+                alert.showAndWait();
+            }
         } catch (Exception e) {
             showAlert("Error", "Failed to load stock: " + e.getMessage());
         }
