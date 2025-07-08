@@ -87,15 +87,15 @@ public class AdminClientFX {
         Tab addAdminTab = new Tab("Add Admin", createAddAdminPane());
         addAdminTab.setClosable(false);
 
-        Tab stockAlertTab = new Tab("Low Stock Alerts", createStockAlertPane());
-        stockAlertTab.setClosable(false);
+        //Tab stockAlertTab = new Tab("Low Stock Alerts", createStockAlertPane());
+        //stockAlertTab.setClosable(false);
 
         Tab totalSalesTab = new Tab("Total Sales", createTotalSalesPane());
         totalSalesTab.setClosable(false);
 
         tabPane.getTabs().addAll(
-                viewReportTab, viewDrinksTab, salesOrderTab, newDrinkTab, restockTab, viewStockTab, addAdminTab,
-                stockAlertTab, totalSalesTab
+                viewReportTab, viewDrinksTab, salesOrderTab, newDrinkTab, restockTab, viewStockTab, addAdminTab
+                /*stockAlertTab*/, totalSalesTab
         );
 
 
@@ -304,10 +304,12 @@ public class AdminClientFX {
     }
 
     // 3. Low Stock Alerts
-
     private VBox createStockAlertPane() {
-        TableView<StockLevels> stockAlertTable = new TableView<>();
-        ObservableList<StockLevels> stockAlertData = FXCollections.observableArrayList();
+
+        stockAlertTable=new TableView<>();
+        stockAlertData=FXCollections.observableArrayList();
+        //TableView<StockLevels> stockAlertTable = new TableView<>();
+        //ObservableList<StockLevels> stockAlertData = FXCollections.observableArrayList();
 
         stockAlertTable.setItems(stockAlertData);
 
@@ -323,20 +325,22 @@ public class AdminClientFX {
         stockAlertTable.getColumns().addAll(drinkCol, branchCol, stockCol);
 
         Button refreshBtn = new Button("Refresh");
-        refreshBtn.setOnAction(e -> loadStockAlertData(stockAlertData));
+        refreshBtn.setOnAction(e -> loadStockAlertData());
 
         VBox vbox = new VBox(10, stockAlertTable, refreshBtn);
         vbox.setPadding(new Insets(10));
 
-        loadStockAlertData(stockAlertData);
+        loadStockAlertData();
 
         return vbox;
     }
 
-    private void loadStockAlertData(ObservableList<StockLevels> stockAlertData) {
+    private void loadStockAlertData() {
         try {
-            List<StockLevels> stocks = db.getLowStockAlerts(); // Assuming this returns drinks with stock < 10
-            stockAlertData.setAll(stocks); // Fixed from stockData to stockAlertData
+            List<StockLevels> stocks = db.getLowStockAlerts();
+            stockAlertData.setAll(stocks);
+
+
         } catch (Exception e) {
             showAlert("Error", "Failed to load stock alerts: " + e.getMessage());
         }
@@ -440,7 +444,7 @@ public class AdminClientFX {
                 restockStatusLabel.setStyle("-fx-text-fill: green;");
                 loadStockData();
                 ObservableList<StockLevels> stockAlertData = FXCollections.observableArrayList();
-                loadStockAlertData(stockAlertData);
+                loadStockAlertData();
             } else {
                 restockStatusLabel.setText("Restock failed.");
                 restockStatusLabel.setStyle("-fx-text-fill: red;");

@@ -47,5 +47,4 @@ public interface DBFunctions extends Remote {
 
     List<StockLevels> getLowStockAlerts() throws RemoteException;
 
-    List<StockAlert> getStockAlerts() throws RemoteException;
 }

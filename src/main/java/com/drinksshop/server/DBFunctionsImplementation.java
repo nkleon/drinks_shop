@@ -64,25 +64,6 @@ public class DBFunctionsImplementation extends UnicastRemoteObject implements DB
         return selections;
     }
 
-//    @Override
-    public List<StockAlert> getStockAlerts() throws RemoteException {
-        List<StockAlert> alerts = new ArrayList<>();
-        String sql = "SELECT name, location, quantity FROM products WHERE quantity < 10";
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
-            while (rs.next()) {
-                String name = rs.getString("name");
-                String location = rs.getString("location");
-                int quantity = rs.getInt("quantity");
-
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-
-        }
-        return alerts;
-    }
 
     @Override
     public List<SalesByDrink> getSalesByDrink() throws SQLException, RemoteException {
@@ -422,16 +403,11 @@ public class DBFunctionsImplementation extends UnicastRemoteObject implements DB
     @Override
     public List<StockLevels> getLowStockAlerts() throws RemoteException {
         List<StockLevels> alerts = new ArrayList<>();
-        String sql = "SELECT \n" +
-                "    s.branch_name, \n" +
-                "    d.drink_name, \n" +
-                "    s.drink_stock \n" +
-                "FROM \n" +
-                "    stock s\n" +
-                "JOIN \n" +
-                "    drinks d ON s.drink_id = d.drink_id\n" +
-                "WHERE \n" +
-                "    s.drink_stock < 10;\n";
+        String sql = "SELECT s.branch_name, d.drink_name, s.drink_stock " +
+                "FROM stock s " +
+                "JOIN drinks d ON s.drink_id = d.drink_id " +
+                "WHERE s.drink_stock < 10";
+
 
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql);
